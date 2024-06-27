@@ -1,0 +1,142 @@
+{
+    "info": {
+      "name": "Webtoon App API",
+      "_postman_id": "12345678-1234-1234-1234-123456789012",
+      "description": "Collection of API endpoints for Webtoon App",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Get Webtoon List",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "https://api.example.com/webtoons",
+            "protocol": "https",
+            "host": [
+              "api",
+              "example",
+              "com"
+            ],
+            "path": [
+              "webtoons"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Webtoon Details",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "https://api.example.com/webtoons/:id",
+            "protocol": "https",
+            "host": [
+              "api",
+              "example",
+              "com"
+            ],
+            "path": [
+              "webtoons",
+              ":id"
+            ],
+            "variable": [
+              {
+                "key": "id",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Episodes",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "https://api.example.com/webtoons/:id/episodes",
+            "protocol": "https",
+            "host": [
+              "api",
+              "example",
+              "com"
+            ],
+            "path": [
+              "webtoons",
+              ":id",
+              "episodes"
+            ],
+            "variable": [
+              {
+                "key": "id",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Add to Favorites",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"userId\": \"user123\",\n    \"webtoonId\": \"1\"\n}"
+          },
+          "url": {
+            "raw": "https://api.example.com/favorites",
+            "protocol": "https",
+            "host": [
+              "api",
+              "example",
+              "com"
+            ],
+            "path": [
+              "favorites"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Remove from Favorites",
+        "request": {
+          "method": "DELETE",
+          "header": [],
+          "url": {
+            "raw": "https://api.example.com/favorites/:id",
+            "protocol": "https",
+            "host": [
+              "api",
+              "example",
+              "com"
+            ],
+            "path": [
+              "favorites",
+              ":id"
+            ],
+            "variable": [
+              {
+                "key": "id",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        "response": []
+      }
+    ]
+  }
+  
