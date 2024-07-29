@@ -1,100 +1,80 @@
+import 'package:fast_toon/features/user/presentation/providers/userProvider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:fast_toon/features/common/presentation/pages/bottomNavigationPage.dart';
 import 'package:fast_toon/features/common/presentation/pages/errorPage.dart';
 import 'package:fast_toon/features/common/presentation/pages/loungePage.dart';
 import 'package:fast_toon/features/extra_service/presentation/pages/MoreScreen.dart';
 import 'package:fast_toon/features/payment/presentation/pages/paymentScreen.dart';
 import 'package:fast_toon/features/user/presentation/pages/myScreen.dart';
-import 'package:fast_toon/features/user/presentation/providers/userProvider.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/BestChallengeScreen.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/EpisodeScreen.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/RecommendedScreen.dart';
-import 'package:fast_toon/features/webtoon/presentation/pages/WebtoonByDayScreen.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/WebtoonScreen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:riverpod/riverpod.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  final user = ref.read(userProvider);
+
   return GoRouter(
     initialLocation: '/webtoon',
     routes: [
-      GoRoute(
-        path: '/',
-        redirect: (context, state) => '/webtoon',
-      ),
-      GoRoute(
-        path: '/webtoon',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const WebtoonScreen(),
-        ),
+      ShellRoute(
+        navigatorKey: GlobalKey<NavigatorState>(),
+        builder: (context, state, child) {
+          return BottomNavigationBarScreen(child: child);
+        },
         routes: [
           GoRoute(
-            path: 'day/:day',
-            pageBuilder: (context, state) {
-              final day = state.pathParameters['day']!;
-              return MaterialPage(
-                key: state.pageKey,
-                child: WebtoonByDayScreen(day: day),
-              );
+            path: '/webtoon',
+            builder: (context, state) => const WebtoonScreen(),
+          ),
+          GoRoute(
+            path: '/recommended',
+            builder: (context, state) => const RecommendedScreen(),
+          ),
+          GoRoute(
+            path: '/bestChallenge/:category',
+            builder: (context, state) {
+              final category = state.pathParameters['category'];
+              final extraValue = state.extra as String?;
+              return BestChallengeScreen(
+                  category: category, extraValue: extraValue);
             },
+            redirect: (context, state) {
+              if (!user.isPremiumMember) {
+                return '/payment';
+              }
+              return null;
+            },
+          ),
+          GoRoute(
+            path: '/my',
+            builder: (context, state) => const MyScreen(),
+          ),
+          GoRoute(
+            path: '/more',
+            builder: (context, state) => const MoreScreen(),
           ),
         ],
       ),
       GoRoute(
-        path: '/recommended',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const RecommendedScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/bestChallenge',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const BestChallengeScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/my',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const MyScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/more',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const MoreScreen(),
-        ),
-      ),
-      GoRoute(
         path: '/episode/:id',
-        pageBuilder: (context, state) {
+        builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return MaterialPage(
-            key: state.pageKey,
-            child: EpisodeScreen(id: id),
-          );
+          return EpisodeScreen(id: id);
         },
       ),
       GoRoute(
         path: '/payment',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const PaymentScreen(),
-        ),
+        builder: (context, state) => const PaymentScreen(),
       ),
       GoRoute(
         path: '/lounge',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const LoungeScreen(),
-        ),
+        builder: (context, state) => const LoungeScreen(),
         redirect: (context, state) {
-          final isPremiumMember = ref.read(userProvider).isPremiumMember;
-          return isPremiumMember ? null : '/payment';
+          final user = ref.read(userProvider);
+          return user.isPremiumMember ? null : '/payment';
         },
       ),
     ],
