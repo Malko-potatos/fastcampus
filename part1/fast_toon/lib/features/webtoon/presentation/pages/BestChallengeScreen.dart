@@ -22,9 +22,21 @@ class BestChallengeScreen extends StatelessWidget {
             if (extraValue != null) Text('Extra Value: $extraValue'),
             ElevatedButton(
               onPressed: () {
-                context.go('/recommended');
+                context.go('/notfound');
               },
-              child: const Text('Go to Recommended'),
+              child: const Text('Go to Route Error'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.go('/restricted');
+              },
+              child: const Text('Go to Restrict'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.go('/bestChallenge/admin');
+              },
+              child: const Text('Go to admin'),
             ),
           ],
         ),

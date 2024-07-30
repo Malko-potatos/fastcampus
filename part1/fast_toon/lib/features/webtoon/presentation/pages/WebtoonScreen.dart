@@ -9,6 +9,8 @@ final selectedDayProvider = StateProvider<String>((ref) {
 class WebtoonScreen extends ConsumerWidget {
   const WebtoonScreen({super.key});
 
+  get tabController => null;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedDay = ref.watch(selectedDayProvider);
@@ -56,9 +58,21 @@ class WebtoonScreen extends ConsumerWidget {
           centerTitle: true,
           backgroundColor: Colors.white,
           elevation: 0,
-          bottom: const TabBar(
-            isScrollable: true,
-            tabs: [
+          bottom: TabBar(
+            controller: tabController,
+            isScrollable: false,
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorPadding: EdgeInsets.zero,
+            labelPadding: const EdgeInsets.symmetric(horizontal: 12), // 패딩 조정
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12, // 글자 크기 감소
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 12, // 글자 크기 감소
+            ),
+            tabs: const [
               Tab(text: '월요일'),
               Tab(text: '화요일'),
               Tab(text: '수요일'),

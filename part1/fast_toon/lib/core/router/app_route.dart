@@ -1,4 +1,6 @@
+import 'package:fast_toon/features/common/presentation/pages/admin.dart';
 import 'package:fast_toon/features/user/presentation/providers/userProvider.dart';
+import 'package:fast_toon/features/webtoon/presentation/pages/WebtoonEpisodeListScreen%20.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,57 +15,109 @@ import 'package:fast_toon/features/webtoon/presentation/pages/EpisodeScreen.dart
 import 'package:fast_toon/features/webtoon/presentation/pages/RecommendedScreen.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/WebtoonScreen.dart';
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final user = ref.read(userProvider);
+  final user = ref.watch(userProvider);
 
   return GoRouter(
     initialLocation: '/webtoon',
+    navigatorKey: _rootNavigatorKey,
     routes: [
-      ShellRoute(
-        navigatorKey: GlobalKey<NavigatorState>(),
-        builder: (context, state, child) {
-          return BottomNavigationBarScreen(child: child);
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return BottomNavigationBarScreen(
+            navigationShell: navigationShell,
+          );
         },
-        routes: [
-          GoRoute(
-            path: '/webtoon',
-            builder: (context, state) => const WebtoonScreen(),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/webtoon',
+                builder: (context, state) => const WebtoonScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'episodeList/:title/:author',
+                    builder: (context, state) {
+                      final title = state.pathParameters['title']!;
+                      final author = state.pathParameters['author']!;
+                      return WebtoonEpisodeListScreen(
+                          title: title, author: author);
+                    },
+                    routes: [
+                      GoRoute(
+                        path: 'episode/:episodeId',
+                        builder: (context, state) {
+                          final episodeId = state.pathParameters['episodeId']!;
+                          return EpisodeScreen(
+                            id: episodeId,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/recommended',
-            builder: (context, state) => const RecommendedScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/recommended',
+                builder: (context, state) => const RecommendedScreen(),
+                redirect: (context, state) {
+                  // 무한 루프 생성
+                  return '/redirect';
+                },
+              ),
+              GoRoute(
+                path: '/redirect',
+                builder: (context, state) =>
+                    const Scaffold(body: Center(child: Text('Redirecting...'))),
+                redirect: (context, state) {
+                  // 다시 /recommended로 리디렉션
+                  return '/recommended';
+                },
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/bestChallenge/:category',
-            builder: (context, state) {
-              final category = state.pathParameters['category'];
-              final extraValue = state.extra as String?;
-              return BestChallengeScreen(
-                  category: category, extraValue: extraValue);
-            },
-            redirect: (context, state) {
-              if (!user.isPremiumMember) {
-                return '/payment';
-              }
-              return null;
-            },
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/bestChallenge',
+                builder: (context, state) => const BestChallengeScreen(),
+                routes: [
+                  GoRoute(
+                    path: '/admin',
+                    builder: (context, state) => const AdminScreen(),
+                  ),
+                ],
+                redirect: (context, state) {
+                  if (isUserAdmin()) {
+                    throw ForbiddenException();
+                  }
+                },
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/my',
-            builder: (context, state) => const MyScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/my',
+                builder: (context, state) => const MyScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/more',
-            builder: (context, state) => const MoreScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/more',
+                builder: (context, state) => const MoreScreen(),
+              ),
+            ],
           ),
         ],
-      ),
-      GoRoute(
-        path: '/episode/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return EpisodeScreen(id: id);
-        },
       ),
       GoRoute(
         path: '/payment',
@@ -73,15 +127,39 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/lounge',
         builder: (context, state) => const LoungeScreen(),
         redirect: (context, state) {
-          final user = ref.read(userProvider);
           return user.isPremiumMember ? null : '/payment';
         },
       ),
     ],
-    errorPageBuilder: (context, state) => MaterialPage(
-      key: state.pageKey,
-      child: const ErrorScreen(),
-    ),
+    errorBuilder: (context, state) => AdvancedErrorScreen(state: state),
     debugLogDiagnostics: true,
   );
 });
+
+class UnauthorizedException implements Exception {
+  final String message;
+
+  UnauthorizedException([this.message = '인증되지 않은 사용자입니다.']);
+
+  @override
+  String toString() => 'UnauthorizedException: $message';
+}
+
+class ForbiddenException implements Exception {
+  final String message;
+
+  ForbiddenException([this.message = '접근 권한이 없습니다.']);
+
+  @override
+  String toString() => 'ForbiddenException: $message';
+}
+
+bool isUserAuthorized() {
+  // 인증 로직 구현
+  return false;
+}
+
+bool isUserAdmin() {
+  // 관리자 확인 로직 구현
+  return false;
+}
