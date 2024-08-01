@@ -6,6 +6,6 @@ final userProvider = StateProvider<User>((ref) {
     email: 'user@example.com',
     nickname: 'User',
     points: 100,
-    isPremiumMember: false,
+    isPremiumMember: true,
   );
 });
