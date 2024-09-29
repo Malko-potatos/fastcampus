@@ -7,7 +7,7 @@ import 'package:fast_toon/features/extra_service/presentation/pages/MoreScreen.d
 import 'package:fast_toon/features/payment/presentation/pages/paymentScreen.dart';
 import 'package:fast_toon/features/user/presentation/pages/myScreen.dart';
 import 'package:fast_toon/features/user/presentation/providers/userProvider.dart';
-import 'package:fast_toon/features/webtoon/presentation/pages/BestChallengeScreen.dart';
+import 'package:fast_toon/features/webtoon/presentation/pages/.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/EpisodeScreen.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/RecommendedScreen.dart';
 import 'package:fast_toon/features/webtoon/presentation/pages/WebtoonEpisodeListScreen%20.dart';
